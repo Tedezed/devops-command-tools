@@ -1,8 +1,0 @@
-#!/bin/bash
-# APT HTTP
-# By Tedezed
-
-curl -o $(echo $1 | rev | cut -d "/" -f1 | rev) -SL -k $1
-sudo dpkg --force-depends -i $(echo $1 | rev | cut -d "/" -f1 | rev)
-rm -f $(echo $1 | rev | cut -d "/" -f1 | rev)
-
