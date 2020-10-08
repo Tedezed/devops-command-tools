@@ -1,0 +1,12 @@
+#!/bin/bash
+# Entrypointd
+# By Tedezed
+set -e
+
+USER=$1
+PATH_ENTRIPOINT_D=$2
+
+echo "[INFO] exec entrypoint.d ${PATH_ENTRIPOINT_D}, user ${USER}"
+sudo chown ${USER} -R ${PATH_ENTRIPOINT_D}/*
+sudo chmod +x -R ${PATH_ENTRIPOINT_D}/*
+run-parts --regex="^[a-zA-Z0-9._-]+$" --report ${PATH_ENTRIPOINT_D}
