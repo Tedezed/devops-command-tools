@@ -1,0 +1,70 @@
+#!/bin/bash
+# By Tedezed
+
+# TARPARTS is a script for compress one path in multiple files tar.gz in multi-threaded mode
+
+if [ "$#" -ne 3 ]; then
+	echo "Format: ./tarparts 3 /home/testdir testfile"
+	exit
+else
+	SOURCEPATH=$2
+	FILENAME=$3
+	PARTS=$1
+fi
+
+# Check num threads and parts
+NUM_THREADS=$(cat /proc/cpuinfo | grep -c 'processor')
+if [ $PARTS -ge $NUM_THREADS ]
+then
+	echo "[ERROR] The parts must be equal or greater than threads in your system"
+	exit 1
+fi
+
+LIST_TO_COMPRESS=$(find $SOURCEPATH -maxdepth 1 | grep -v "$SOURCEPATH$")
+LEN_DIRECTORY=$(echo $LIST_TO_COMPRESS | wc -w)
+FILES_DIRS_IN_PARTS=$((LEN_DIRECTORY / PARTS))
+
+# Odd in the latest part
+ODD_CHECK=$((LEN_DIRECTORY - (FILES_DIRS_IN_PARTS * PARTS)))
+if [ $ODD_CHECK -gt 0 ]; then
+	#echo "Odd: $ODD_CHECK"
+	ODD_CHECK=$ODD_CHECK
+else
+	ODD_CHECK=0
+fi
+
+#echo "Sources: $LEN_DIRECTORY"
+#echo "Sources in one part: $FILES_DIRS_IN_PARTS"
+
+## TAR MODES
+# No compress
+#tar -cf filestore-$FECHA.tar $DATADIR_ODOO/*
+# Compress
+#tar -czf -C $DATADIR_ODOO filestore-$FILESTORE-$FECHA.tar.gz
+# Consume less memory RAM
+#tar -cf - -C $DATADIR_ODOO . | gzip -cv - > filestore-$FILESTORE-$FECHA.tar.gz
+# List files
+#find '/home/testdir'| grep -v '/home/testdir$' | tar -cf - -T - | gzip -cv - > test.tar.gz
+
+INDEX=0
+COUNT=0
+arr=($LIST_TO_COMPRESS)
+for ((p=1; p<=$PARTS; p+=1)); do
+	echo "Part: $p"
+	LIST_IN_PART=""
+	for ((i=$((0 + INDEX)); i<=$((FILES_DIRS_IN_PARTS + INDEX)); i+=1)); do
+		if [ "${arr[$i]}" != "" ]; then
+			echo "  Source: ${arr[$i]}";
+			COUNT=$((COUNT + 1))
+			#if [ $COUNT -ge $((FILES_DIRS_IN_PARTS + INDEX)) ]; then
+			LIST_IN_PART="$LIST_IN_PART${arr[$i]}\n"
+		fi
+	done
+	#echo -e "$LIST_IN_PART" | tar -cf - -T - | gzip -cv - > $FILENAME-part$p.tar.gz
+	nohup /bin/bash -c "echo -e "\""$LIST_IN_PART"\"" | tar -cf - -T - | gzip -cv - > $FILENAME-part$p.tar.gz" &
+	INDEX=$i
+done
+
+sleep 1
+echo "Compress $COUNT from $LEN_DIRECTORY"
+
