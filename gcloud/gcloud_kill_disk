@@ -1,0 +1,6 @@
+#!/bin/bash
+# By Tedezed
+# For Cloud Cementery
+
+gcloud compute disks snapshot $1 --zone $2 --snapshot-names dead-$1 --storage-location=$3 --labels funeral-home=true
+gcloud compute disks delete $1 --zone $2

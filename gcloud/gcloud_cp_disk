@@ -1,0 +1,5 @@
+#!/bin/bash
+
+gcloud compute disks snapshot $1 --snapshot-names=$2 --zone=$3 --storage-location=$4
+gcloud compute disks create $2 --source-snapshot=$2 --zone=$3
+echo -ne '\n' | gcloud compute snapshots delete $
