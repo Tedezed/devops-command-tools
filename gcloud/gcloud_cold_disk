@@ -2,5 +2,26 @@
 # By Tedezed
 # For Cloud Cementery
 
-gcloud compute disks snapshot $1 --zone $2 --snapshot-names cold-$1 --storage-location=$3
-gcloud compute disks delete $1 --zone $2
+cat <<EOF
+Usage gcloud_cold_disk -i disk_origin -z europe-west1-b -l europe-west1
+    -i : Input disk
+    -z : Zone
+    -l : Location
+    -h : help
+EOF
+exit 2
+}
+
+while getopts ":i:o:z:l:h" OPTIONS; do
+    case "${OPTIONS}" in
+        i) INPUT=${OPTARG} ;;
+        z) ZONE=${OPTARG} ;;
+        l) LOCATION=${OPTARG} ;;
+        h) usage ;;
+        *) usage ;;
+    esac
+done
+
+gcloud compute disks snapshot ${INPUT} --zone ${ZONE} --snapshot-names cold-${INPUT} \
+    --storage-location=${LOCATION}
+gcloud compute disks delete ${INPUT} --zone ${ZONE}

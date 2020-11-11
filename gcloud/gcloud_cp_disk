@@ -1,5 +1,31 @@
 #!/bin/bash
+# GCP fast disk cp
+# By Tedezed
 
-gcloud compute disks snapshot $1 --snapshot-names=$2 --zone=$3 --storage-location=$4
-gcloud compute disks create $2 --source-snapshot=$2 --zone=$3
-echo -ne '\n' | gcloud compute snapshots delete $
+usage ()
+{
+cat <<EOF
+Usage gcloud_cp_disk -i disk_origin -o disk_output -z europe-west1-b -l europe-west1
+    -i : Input disk
+    -o : Output disk
+    -z : Zone
+    -l : Location
+    -h : help
+EOF
+exit 2
+}
+
+while getopts ":i:o:z:l:h" OPTIONS; do
+    case "${OPTIONS}" in
+        i) INPUT=${OPTARG} ;;
+        o) OUTPUT=${OPTARG} ;;
+        z) ZONE=${OPTARG} ;;
+        l) LOCATION=${OPTARG} ;;
+        h) usage ;;
+        *) usage ;;
+    esac
+done
+
+gcloud compute disks snapshot ${INPUT} --snapshot-names=${OUTPUT} --zone=${ZONE} --storage-location=${LOCATION}
+gcloud compute disks create ${OUTPUT} --source-snapshot=${OUTPUT} --zone=${ZONE}
+echo -ne '\n' | gcloud compute snapshots delete ${OUTPUT}

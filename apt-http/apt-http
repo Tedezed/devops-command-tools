@@ -1,8 +1,31 @@
 #!/bin/bash
 # APT HTTP
-# By Tedezed
+# By Tedezed and Manuelchacon07
 
-curl -o $(echo $1 | rev | cut -d "/" -f1 | rev) -SL -k $1
-sudo dpkg --force-depends -i $(echo $1 | rev | cut -d "/" -f1 | rev)
-rm -f $(echo $1 | rev | cut -d "/" -f1 | rev)
+# Exampel for Docker
+# > cat apt-requirements
+# libldap2-dev
+# libsasl2-dev
+# libffi-dev
+# libjpeg-dev
+# libpng-dev
+# http://XXXXXX/debian/pool/main/libj/libjpeg-turbo/libjpeg-turbo8_1.4.2-0ubuntu3.4_amd64.deb
+# http://XXXXXX/debian/pool/main/libj/libjpeg8-empty/libjpeg8_8c-2ubuntu8_amd64.deb
+#
+#RUN sudo apt-get update \
+#   && cat apt-requirements | grep -v 'http://\|https://' | xargs apt-get install -y --no-install-recommends \
+#   && cat apt-requirements | grep 'http://\|https://' | xargs apt_http
+
+if [ "$1" != "" ]; then
+    echo "[INFO] Input: $@"
+    for p in $@
+    do
+        echo "[INFO] Package: $p"
+        curl -o $(echo $p | rev | cut -d "/" -f1 | rev) -SL -k $p
+        sudo dpkg --force-depends -i $(echo $p | rev | cut -d "/" -f1 | rev)
+        rm -f $(echo $p | rev | cut -d "/" -f1 | rev)
+    done
+else
+    echo "Usage: apt-http http://XXXXXX/debian/pool/main/w/wkhtmltox/wkhtmltox_0.12.1_amd64.deb"
+fi
 
