@@ -1,0 +1,45 @@
+#!/bin/bash
+# By Tedezed
+# Gcloud assign permissions for multiple users and buckets
+
+usage() { 
+	echo "Usage: $0 -t [MEMBER_TYPE] -i [ROLE] -e [EMAILS] -b [BUCKETS]" 1>&2;
+	echo "Example: $0 -t user -i roles/storage.objectAdmin -e email1@gmail.com,email2@gmail.com -b bucket1,bucket2" 1>&2;
+	exit 1;
+}
+
+while getopts ":t:e:i:b:" o; do
+    case "${o}" in
+    	t)
+            MEMBER_TYPE=${OPTARG} # https://cloud.google.com/storage/docs/access-control/using-iam-permissions#gsutil_1
+            ;;
+        e)
+            e=${OPTARG}
+            ;;
+        i)
+            IAM_ROLE=${OPTARG} # 'roles/storage.objectAdmin' - https://cloud.google.com/storage/docs/access-control/iam-roles
+            ;;
+        b)
+            b=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${MEMBER_TYPE}" ] || [ -z "${e}" ] || [ -z "${IAM_ROLE}" ] || [ -z "${b}" ]; then
+    usage
+fi
+
+# Gcloud buckat IAM
+
+for MEMBER_NAME in $(echo "${e}" | tr ',' ' ')
+do
+	for BUCKET_NAME in $(echo "${b}" | tr ',' ' ')
+	do
+		echo "Grant ${IAM_ROLE} to ${MEMBER_NAME} in ${BUCKET_NAME}"
+		gsutil iam ch ${MEMBER_TYPE}:${MEMBER_NAME}:${IAM_ROLE} gs://${BUCKET_NAME}
+	done
+done
