@@ -26,7 +26,10 @@ loading &
 
 time_sleep=$(( input_time*60 ))
 sleep $time_sleep
+
+pactl set-sink-volume @DEFAULT_SINK@ -30%
 play -n synth 1 pluck E3 pluck C3 repeat 2 channels 1
+pactl set-sink-volume @DEFAULT_SINK@ +30%
 
 kill_loading
 
