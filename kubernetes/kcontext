@@ -1,0 +1,29 @@
+#!/bin/bash
+# kcontext
+# By Tedezed
+
+function get_kube_clusters () {
+	cont=0
+	cluster_found=0
+	for cluster in $(kubectl config get-contexts | grep -v NAME | awk '{ print $2 }'); do
+		if [ "$1" == "get_clusters" ]; then
+			echo "[$cont] $cluster";
+		fi
+		if [ "$1" == "connect_to_clusters" ] && [ "$2" == "$cont" ]; then
+			kubectl config use-context $cluster
+			cluster_found=1
+		fi
+		cont=$(( cont + 1 ))
+	done
+	if [ "$1" == "connect_to_clusters" ] && [ "$cluster_found" == "0" ]; then
+		echo "[ERROR] Kubernetes cluster not found"
+	fi
+}
+
+echo "Current: $(kubectl config current-context)"
+echo ""
+echo "List of contexts:"
+get_kube_clusters "get_clusters"
+echo ""
+read -r -p 'Context number to switch: ' num_cluster
+get_kube_clusters "connect_to_clusters" $num_cluster

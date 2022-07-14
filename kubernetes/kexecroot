@@ -1,0 +1,10 @@
+#!/bin/bash
+# kexecroot
+# By Tedezed
+
+NAME_POD=$1
+NAMESPACE=$2
+
+NODE_POD=$(kubectl get pod $NAME_POD -n $NAMESPACE -o json | jq '.spec.nodeName' | tr -d '"')
+ID_POD_DOCKER=$(gcloud compute ssh $NODE_POD -- docker ps | grep "$NAME_POD" | grep "$NAMESPACE" | grep -v "POD" | awk '{print $1}')
+gcloud compute ssh $NODE_POD -- docker exec -it -u 0 $ID_POD_DOCKER /bin/sh

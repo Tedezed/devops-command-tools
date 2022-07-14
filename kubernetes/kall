@@ -1,0 +1,8 @@
+#!/bin/bash
+# kall
+# By Tedezed
+
+for context in $(kubectl config get-contexts | grep -v NAME | awk '{ print $2 }'); do
+    echo "[$context]";
+    kubectl --context=$context $@
+done
