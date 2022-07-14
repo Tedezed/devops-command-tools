@@ -1,0 +1,33 @@
+#!/bin/bash
+# Pomodoro
+# By Tedezed
+
+loading()
+{
+    chars="/-\|"
+
+    while :; do
+        for (( i=0; i<${#chars}; i++ )); do
+            sleep 0.2
+            echo -en "${chars:$i:1}" "\r" >&2
+        done
+    done
+}
+
+kill_loading()
+{
+    kill "$!"
+}
+
+input_time=$1
+echo "Pomodoro start: $input_time minutes"
+
+loading &
+
+time_sleep=$(( input_time*60 ))
+sleep $time_sleep
+play -n synth 1 pluck E3 pluck C3 repeat 2 channels 1
+
+kill_loading
+
+echo "Pomodoro Stop"
