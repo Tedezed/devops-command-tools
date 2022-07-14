@@ -2,6 +2,40 @@
 # Pomodoro
 # By Tedezed
 
+loading_time()
+{
+    time_input=$1
+
+    current_time=$time_input
+    seconds=0
+    time_output="$current_time:00"
+
+    chars="/-\|"
+
+    while :; do
+
+        for (( i=0; i<${#chars}; i++ )); do
+
+            echo -en "  Time left: (${chars:$i:1}) $time_output" "\r" >&2
+
+            if [ $seconds -eq 0 ]; then
+                seconds=59
+                current_time=$((current_time-1))
+            fi
+
+            if [ $seconds -lt 10 ]; then
+                time_output="$current_time:0$seconds"
+            else
+                time_output="$current_time:$seconds"
+            fi
+
+            sleep 1
+            seconds=$((seconds-1))
+        done
+
+    done
+}
+
 loading()
 {
     chars="/-\|"
@@ -20,16 +54,25 @@ kill_loading()
 }
 
 input_time=$1
+if [ -z "$input_time" ] || ! [[ "$input_time" =~ ^[0-9]+$ ]]; then
+    echo "[ERROR] Input valid time in minutes"
+    exit 1
+fi
+if [ 1 -gt $input_time ]; then
+    echo "[ERROR] Input valid time greater than one minute"
+    exit 1
+fi
+
 echo "Pomodoro start: $input_time minutes"
 
-loading &
+loading_time $input_time &
 
 time_sleep=$(( input_time*60 ))
 sleep $time_sleep
 
-pactl set-sink-volume @DEFAULT_SINK@ -30%
+pactl set-sink-volume @DEFAULT_SINK@ -35%
 play -n synth 1 pluck E3 pluck C3 repeat 2 channels 1
-pactl set-sink-volume @DEFAULT_SINK@ +30%
+pactl set-sink-volume @DEFAULT_SINK@ +35%
 
 kill_loading
 
