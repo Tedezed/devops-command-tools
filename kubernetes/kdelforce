@@ -2,7 +2,7 @@
 # kdelforce
 # By Tedezed
 
-NAMESPCE=$2
+NAMESPCE=$1
 
 if [ -z "$NAMESPCE" ]; then
     echo "[ERROR] invalid input"
