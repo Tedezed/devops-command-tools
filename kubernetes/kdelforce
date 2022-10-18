@@ -1,0 +1,18 @@
+#!/bin/bash
+# kdelforce
+# By Tedezed
+
+NAMESPCE=$2
+
+if [ -z "$NAMESPCE" ]; then
+    echo "[ERROR] invalid input"
+    exit 1
+fi
+
+ENTITIES=$(kubectl get pod -n $NAMESPCE -o jsonpath='{.items[*].metadata.name}')
+
+for ENTITY in $ENTITIES
+do
+    echo "Force delete pod $ENTITY"
+    kubectl delete pod $ENTITY -n $NAMESPCE --force --grace-period=0
+done
