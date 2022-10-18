@@ -1,0 +1,22 @@
+#!/bin/bash
+# kscale: Easy scale all namespace
+# By Tedezed
+
+TYPE=$1
+NAMESPCE=$2
+SCALE=$3
+
+if [ -z "$TYPE" ] || [ -z "$NAMESPCE" ] || [ -z "$SCALE" ]; then
+    echo "[ERROR] invalid input, example:"
+    echo "   kscale [ENTITY] [NAMESPACE] [SCALE]"
+    echo "   kscale deploy dev 0"
+    exit 1
+fi
+
+ENTITIES=$(kubectl get $TYPE -n $NAMESPCE -o jsonpath='{.items[*].metadata.name}')
+
+for ENTITY in $ENTITIES
+do
+    echo "Scale $TYPE $ENTITY to $SCALE"
+    kubectl scale $TYPE $ENTITY --replicas=0 -n $NAMESPCE 
+done
