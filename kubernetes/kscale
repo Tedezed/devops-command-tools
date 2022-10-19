@@ -17,6 +17,6 @@ ENTITIES=$(kubectl get $TYPE -n $NAMESPCE -o jsonpath='{.items[*].metadata.name}
 
 for ENTITY in $ENTITIES
 do
-    echo "Scale $TYPE $ENTITY to $SCALE"
+    echo "[INFO] Scale $TYPE $ENTITY to $SCALE"
     kubectl scale $TYPE $ENTITY --replicas=0 -n $NAMESPCE 
 done
