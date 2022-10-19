@@ -80,7 +80,7 @@ $ outputlog "INFO" "This is a example"
 
 #### pomodoro
 
-Simple Pomodorofor your shell.
+Simple pomodoro timmer your shell.
 
 ```
 $ pomodoro 1
@@ -93,5 +93,6 @@ Pomodoro start: 1 minutes
 Script for compress one path in multiple files tar.gz in multi-threaded mode.
 
 ```
+# Example: Compress in three files with name testfile the directory testdir
 $ tarparts 3 /home/testdir testfile
 ```
