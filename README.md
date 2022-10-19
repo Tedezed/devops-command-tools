@@ -96,3 +96,20 @@ Script for compress one path in multiple files tar.gz in multi-threaded mode.
 # Example: Compress in three files with name testfile the directory testdir
 $ tarparts 3 /home/testdir testfile
 ```
+
+#### trycommand
+
+Execute a command and if it fails retry it a number of times.
+
+```
+$ trycommand -s 2 -t 3 -c "psql -h 192.168.1.5 -U tedezed -d animals"
+psql: error: could not connect to server: No route to host
+        Is the server running on host "192.168.1.5" and accepting
+        TCP/IP connections on port 5432?
+psql: error: could not connect to server: No route to host
+        Is the server running on host "192.168.1.5" and accepting
+        TCP/IP connections on port 5432?
+psql: error: could not connect to server: No route to host
+        Is the server running on host "192.168.1.5" and accepting
+        TCP/IP connections on port 5432?
+```
