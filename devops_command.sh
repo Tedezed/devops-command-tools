@@ -32,6 +32,25 @@ tarparts
 trycommand
 "
 
+# ls -d */
+list_install_docker="
+apt-http/apt-http
+docker/dsearch
+docker/dtags
+entrypointd/entrypointd
+kubernetes/kall
+kubernetes/kcontext
+kubernetes/kdelforce
+kubernetes/kexec
+kubernetes/kexecronjob
+kubernetes/kndefault
+kubernetes/kscale
+kubernetes/ksecret
+logger/outputlog
+tarparts/tarparts
+trycommand/trycommand
+"
+
 if [ "$OPTION" == "--install" ]; then
 
     echo "[INFO] Dependency installation"
@@ -42,6 +61,16 @@ if [ "$OPTION" == "--install" ]; then
 
     echo "[INFO] Copy to /usr/bin/"
     sudo cp */* /usr/bin/
+
+elif [ "$OPTION" == "--install-docker" ]; then
+
+    for script in $list_install_docker;
+    do
+        dir_name=$(echo $script | cut -d '/' -f1)
+        script_name=$(echo $script | cut -d '/' -f2)
+        curl -SL https://raw.githubusercontent.com/Tedezed/devops-command-tools/master/$script \
+            -o /usr/bin/$script_name
+    done
 
 elif [ "$OPTION" == "--uninstall" ]; then
 
@@ -56,7 +85,7 @@ elif [ "$OPTION" == "--uninstall" ]; then
 else
 
     echo "[ERROR] invalid input"
-
+    
 fi
 
 
