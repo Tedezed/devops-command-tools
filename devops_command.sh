@@ -22,7 +22,7 @@ killgrep
 kall
 kcontext
 kdelforce
-kexecroot
+kexec
 kndefault
 kscale
 ksecret
@@ -33,9 +33,18 @@ trycommand
 "
 
 if [ "$OPTION" == "--install" ]; then
+
+    echo "[INFO] Dependency installation"
+    # Kubernetes
+    sudo apt-get install jq kubectl
+    # Pomodoro
+    sudo apt-get install pulseaudio-utils soxt
+
     echo "[INFO] Copy to /usr/bin/"
     sudo cp */* /usr/bin/
+
 elif [ "$OPTION" == "--uninstall" ]; then
+
     for script in $list_scripts;
     do
         if [ -f "/usr/bin/$script" ]; then
@@ -43,8 +52,11 @@ elif [ "$OPTION" == "--uninstall" ]; then
             sudo rm -f /usr/bin/$script
         fi
     done
+
 else
+
     echo "[ERROR] invalid input"
+
 fi
 
 

@@ -44,9 +44,9 @@ Context number to switch:
 
 Force delete all pods in a namespace.
 
-#### kexecroot
+#### kexec
 
-Force connect to a pod with root user.
+Force connect to a pod with root user or connect to node pool with option `--ssh`.
 
 #### kndefault
 
@@ -68,6 +68,18 @@ $ kscale deploy dev 0
 Show the contents of secrets with base64 decode.
 
 ## Utilities
+
+#### killgrep
+
+Kill with name not PID.
+
+```
+$ ps -aux | grep terminator
+ubuntu    8443  0.0  0.4 434654 238349 ?        Sl   01:30   0:04 /usr/bin/python3 /usr/bin/terminator
+ubuntu   34555  0.0  0.0  0349  993944 pts/1    S+   11:33   0:00 grep --color=auto terminator
+
+$ killgrep terminator
+```
 
 #### outputlog
 

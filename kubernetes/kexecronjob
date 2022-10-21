@@ -1,0 +1,14 @@
+#!/bin/bash
+# kexecronjob
+# By Tedezed
+
+CRONJOB_NAME=$1
+CRONJOB_NAMESPACE=$2
+
+if [ -z "$CRONJOB_NAME" ] || [ -z "$CRONJOB_NAMESPACE" ]; then
+    echo "[ERROR] invalid input, example:"
+    echo "   kexecronjob [CRONJOB] [NAMESPACE]"
+    exit 1
+fi
+
+kubectl create job --from=cronjob/${CRONJOB_NAME} ${CRONJOB_NAME}-$RANDOM -n ${CRONJOB_NAMESPACE}

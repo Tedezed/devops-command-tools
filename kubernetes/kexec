@@ -1,0 +1,25 @@
+#!/bin/bash
+# kexec
+# By Tedezed
+
+NAME_POD=$1
+NAMESPACE=$2
+OPTION=$3
+
+set -e
+
+if [ -z "$NAME_POD" ] || [ -z "$NAMESPACE" ] ; then
+    echo "[ERROR] invalid input: kexec POD_NAME NAMESPACE [OPTION]"
+    exit 1
+fi
+
+NODE_POD=$(kubectl get pod $NAME_POD -n $NAMESPACE -o json | jq '.spec.nodeName' | tr -d '"')
+NODE_ZONE=$(kubectl get node $NODE_POD -o json | jq '.metadata.labels."topology.kubernetes.io/zone"' | tr -d '"')
+ID_POD_DOCKER=$(gcloud compute ssh $USER@$NODE_POD --zone=$NODE_ZONE -- docker ps | grep "$NAME_POD" | grep "$NAMESPACE" | grep -v "POD" | awk '{print $1}')
+
+if [ "$OPTION" == "--ssh" ]; then
+    gcloud compute ssh $USER@$NODE_POD --zone=$NODE_ZONE
+else
+    gcloud compute ssh $USER@$NODE_POD --zone=$NODE_ZONE -- docker exec -it -u 0 $ID_POD_DOCKER /bin/sh
+fi
+
