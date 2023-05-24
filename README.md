@@ -1,8 +1,8 @@
 # DevOps Command Tools
 
-- Install: `bash devops_command.sh.sh --install`
-- Install for Docker (Only scripts): `bash devops_command.sh.sh --install-docker`
-- Uninstall: `bash devops_command.sh.sh --uninstall`
+- Install: `bash devops_command.sh --install`
+- Install for Docker (Only scripts): `bash devops_command.sh --install-docker`
+- Uninstall: `bash devops_command.sh --uninstall`
 
 ## Kubernetes
 
