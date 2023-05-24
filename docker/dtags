@@ -1,5 +1,29 @@
 #!/bin/bash
-# dtags
+# Docker hub tags
 # By Tedezed
 
-wget -q https://registry.hub.docker.com/v1/repositories/$1/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}';
+set -e
+
+url='https://hub.docker.com/v2/namespaces'
+options='page_size=100'
+
+if [ -z "$1" ] && [ -z "$2" ]; then
+  echo """[dtags] Docker hub tags usage:
+  - dtags (repository) [namespace]
+  - dtags node
+  - dtags squirrel tedezed
+"""
+else
+  if [ -z "$1" ]; then
+    echo "[ERROR] Need var repository"
+  fi
+  if [ -z "$2" ]; then
+    namespace="library"
+  else
+    namespace="$2"
+  fi
+  for index in $(seq 1 100); do
+	curl -sS ${url}/${namespace}/repositories/$1/tags?${options}\&page=${index} \
+	  | jq .results[].name -r 2>/dev/null
+  done
+fi
