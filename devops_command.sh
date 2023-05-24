@@ -11,7 +11,6 @@ fi
 #ls ./* | grep -v "\.\/*"
 list_scripts="
 apt-http
-dsearch
 dtags
 entrypointd
 gcloud_bucket_iam
@@ -35,7 +34,6 @@ trycommand
 # ls -d */
 list_install_docker="
 apt-http/apt-http
-docker/dsearch
 docker/dtags
 entrypointd/entrypointd
 kubernetes/kall
@@ -52,7 +50,6 @@ trycommand/trycommand
 "
 
 if [ "$OPTION" == "--install" ]; then
-
     echo "[INFO] Dependency installation"
     # Kubernetes
     sudo apt-get install jq kubectl
@@ -61,9 +58,7 @@ if [ "$OPTION" == "--install" ]; then
 
     echo "[INFO] Copy to /usr/bin/"
     sudo cp */* /usr/bin/
-
 elif [ "$OPTION" == "--install-docker" ]; then
-
     for script in $list_install_docker;
     do
         dir_name=$(echo $script | cut -d '/' -f1)
@@ -71,9 +66,7 @@ elif [ "$OPTION" == "--install-docker" ]; then
         curl -SL https://raw.githubusercontent.com/Tedezed/devops-command-tools/master/$script \
             -o /usr/bin/$script_name
     done
-
 elif [ "$OPTION" == "--uninstall" ]; then
-
     for script in $list_scripts;
     do
         if [ -f "/usr/bin/$script" ]; then
@@ -81,11 +74,8 @@ elif [ "$OPTION" == "--uninstall" ]; then
             sudo rm -f /usr/bin/$script
         fi
     done
-
 else
-
     echo "[ERROR] invalid input"
-    
 fi
 
 
