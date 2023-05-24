@@ -13,6 +13,7 @@ list_scripts="
 apt-http
 dtags
 entrypointd
+gcloud_bucket_project
 gcloud_bucket_iam
 gcloud_cold_disk
 gcloud_cp_disk

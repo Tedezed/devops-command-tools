@@ -1,0 +1,10 @@
+#!/bin/bash
+# By Tedezed
+# Gcloud find the bucket project
+
+BUCKET_NAME=$1
+PROJECT_NUMBER=$(curl -X GET \
+                    -H "Authorization: Bearer $(gcloud auth application-default print-access-token)" \
+                    "https://storage.googleapis.com/storage/v1/b/${BUCKET_NAME}?fields=projectNumber" \
+                    | jq .projectNumber | sed 's/"//' | sed 's/"//')
+gcloud projects list --filter "PROJECT_NUMBER=${PROJECT_NUMBER}"
