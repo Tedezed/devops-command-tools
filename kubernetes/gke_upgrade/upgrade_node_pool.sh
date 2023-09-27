@@ -7,7 +7,7 @@ usage ()
 cat <<EOF
 upgrade_node_pool: Automation synchronize version of node pools with GKE master.
 
-Usage: bash upgrade_node_pool.sh -p renault-georeporting -k renault-georeporting -z europe-west1-b
+Usage: bash upgrade_node_pool.sh -p google-project-name -k gke-cluster-name -z europe-west1-b
 EOF
 exit 2
 }
