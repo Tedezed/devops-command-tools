@@ -10,6 +10,7 @@ kind_api_version_upgrade: Automation to update kubernetes yaml files in a path t
 Usage: bash kind_api_version_upgrade.sh -k CronJob:batch/v1,HorizontalPodAutoscaler:autoscaling/v2 -p /home/user/git/projects_gke
 Example: apiVersion: batch/v1beta1 and kind: CronJob ---> apiVersion: batch/v1, kind: CronJob
 
+
 EOF
 exit 2
 }
