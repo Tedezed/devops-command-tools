@@ -9,10 +9,10 @@
 3. Where we run the script `kind_api_version_upgrade.sh` to see the changes:
 
 ```
-bash kind_api_version_upgrade.sh -k CronJob:batch/v1,HorizontalPodAutoscaler:autoscaling/v2 -p /home/user/git/destination
+bash kind_api_version_upgrade.sh -k CronJob:batch/v1,HorizontalPodAutoscaler:autoscaling/v2 -p /home/user/git/source-destination
 ```
 
-5. The script goes through all the yaml files and updates the ones it considers necessary. It currently uses kube-convert which is not a final version, so the changes you make should be taken as a guideline, see path `/home/user/git/destination`.
+5. The script goes through all the yaml files and updates the ones it considers necessary. It currently uses kube-convert which is not a final version, so the changes you make should be taken as a guideline, see path `/home/user/git/source-destination`.
 
 6. Once the changes in the repository are prepared, we can proceed to update the cluster.
 
