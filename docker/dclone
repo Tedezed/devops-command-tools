@@ -1,0 +1,39 @@
+#!/bin/bash
+# Clone Docker hub repositories
+# By Tedezed
+
+url='https://hub.docker.com/v2/namespaces'
+options='page_size=100'
+
+namespace=$1
+remote=$2
+
+if [ -z "${namespace}" ] && [ -z "${remote}" ]; then
+  echo "[Execution] dclone nginx gcr.io/gcp-project/docker-hub"
+  exit 1
+else
+    for repository in $(curl -sS ${url}/${namespace}/repositories | jq .results | jq -r .[].name)
+    do
+        echo "[INFO] Clone: ${namespace}/${repository}"
+        for index in $(seq 1 100)
+        do
+            if [ "$(curl -sS ${url}/${namespace}/repositories/${repository}/tags?${options}\&page=${index} \
+            | jq .results[].name -r 2>/dev/null)" ]; then
+                for tag in $(curl -sS ${url}/${namespace}/repositories/${repository}/tags?${options}\&page=${index} \
+                | jq .results[].name -r 2>/dev/null)
+                do
+                    echo "  - Clone repository: ${namespace}/${repository}:${tag}"
+                    set -x
+                    docker pull ${namespace}/${repository}:${tag}
+                    docker tag ${namespace}/${repository}:${tag} ${remote}/${repository}:${tag}
+                    docker push ${remote}/${repository}:${tag}
+                    docker rmi ${namespace}/${repository}:${tag}
+                    docker rmi ${remote}/${repository}:${tag}
+                    set +x
+                done
+            else
+                break
+            fi
+        done
+    done
+fi
