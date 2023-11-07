@@ -4,13 +4,26 @@
 
 FILE=$1
 
+if [ -z "$FILE" ]; then
+    echo "[ERROR] Need a file yaml of Cloud build"
+    exit 1
+fi
+
+printenv > /tmp/original_env
+
+# Load default env variables
+eval $(cat terraform.yaml | python3 -c 'import sys, yaml, json;
+yaml_file = yaml.safe_load(sys.stdin.read());
+for i in yaml_file["options"]["env"]:
+    print("""export %s """ % (i))')
+
 # Load substitutions
 eval $(cat ${FILE} | python3 -c 'import sys, yaml, json;
 yaml_file = yaml.safe_load(sys.stdin.read());
 for i in yaml_file["substitutions"]:
     print("""export %s="%s" """ % (i, yaml_file["substitutions"][i]))')
 
-# Load secretManager definitions
+# Define secretManager definitions to load
 eval $(cat ${FILE} | python3 -c 'import sys, yaml, json;
 yaml_file = yaml.safe_load(sys.stdin.read());
 for i in yaml_file["availableSecrets"]["secretManager"]:
@@ -22,6 +35,12 @@ do
     NAME_LOAD_SECRET=$(echo $secret | cut -d = -f1)
     PATH_LOAD_SECRET=$(echo $secret | cut -d = -f2)
     SECRET_ENV=$(echo $NAME_LOAD_SECRET | sed 's/__/ /g' | cut -d ' ' -f1)
-    echo " ${SECRET_ENV}=$(gcloud secrets versions access ${PATH_LOAD_SECRET})"
+    #echo " ${SECRET_ENV}=$(gcloud secrets versions access ${PATH_LOAD_SECRET})"
     eval "export ${SECRET_ENV}='$(gcloud secrets versions access ${PATH_LOAD_SECRET})'"
 done
+
+printenv > /tmp/modify_env
+
+echo "ℹ️ New vars: "
+diff /tmp/original_env /tmp/modify_env
+
