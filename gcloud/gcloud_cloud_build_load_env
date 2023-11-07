@@ -1,0 +1,27 @@
+#!/bin/bash
+# By Tedezed
+# Terraform load env variables and secrets
+
+FILE=$1
+
+# Load substitutions
+eval $(cat ${FILE} | python3 -c 'import sys, yaml, json;
+yaml_file = yaml.safe_load(sys.stdin.read());
+for i in yaml_file["substitutions"]:
+    print("""export %s="%s" """ % (i, yaml_file["substitutions"][i]))')
+
+# Load secretManager definitions
+eval $(cat ${FILE} | python3 -c 'import sys, yaml, json;
+yaml_file = yaml.safe_load(sys.stdin.read());
+for i in yaml_file["availableSecrets"]["secretManager"]:
+    print("""export %s__SECRET_TO_LOAD="%s" """ % (i["env"], i["versionName"]))')
+
+# Load secretManager secrets versions
+for secret in $(printenv | grep '__SECRET_TO_LOAD');
+do
+    NAME_LOAD_SECRET=$(echo $secret | cut -d = -f1)
+    PATH_LOAD_SECRET=$(echo $secret | cut -d = -f2)
+    SECRET_ENV=$(echo $NAME_LOAD_SECRET | sed 's/__/ /g' | cut -d ' ' -f1)
+    echo " ${SECRET_ENV}=$(gcloud secrets versions access ${PATH_LOAD_SECRET})"
+    eval "export ${SECRET_ENV}='$(gcloud secrets versions access ${PATH_LOAD_SECRET})'"
+done
