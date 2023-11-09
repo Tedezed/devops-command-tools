@@ -12,7 +12,7 @@ fi
 printenv > /tmp/original_env
 
 # Load default env variables
-eval $(cat terraform.yaml | python3 -c 'import sys, yaml, json;
+eval $(cat ${FILE} | python3 -c 'import sys, yaml, json;
 yaml_file = yaml.safe_load(sys.stdin.read());
 for i in yaml_file["options"]["env"]:
     print("""export %s """ % (i))')
