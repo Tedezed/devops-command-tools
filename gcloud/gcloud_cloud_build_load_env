@@ -40,7 +40,6 @@ do
 done
 
 printenv > /tmp/modify_env
+diff -d /tmp/original_env /tmp/modify_env | egrep -v '^[0-9A-Za-z]' | sed 's/> /export /g' > /tmp/output_env
 
-echo "ℹ️ New vars: "
-diff /tmp/original_env /tmp/modify_env
-
+echo "ℹ️ Execute: source /tmp/output_env"
