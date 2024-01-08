@@ -1,0 +1,22 @@
+#!/bin/bash
+# gcloud_bq_size
+# By Tedezed
+
+project=$1
+
+if [ -z "$project" ]; then
+    echo "[ERROR] Need a project id: gcloud_bq_size gcp-project-example"
+    exit 1
+fi
+
+sum_size=0
+set -x
+for dataset in $(bq ls --format=prettyjson --project_id=${project} | jq -r .[].id)
+do
+  size=$(bq query --project_id=${project} --format=prettyjson \
+    "SELECT sum(size_bytes) FROM $(echo ${dataset} | cut -d ':' -f2).__TABLES__" | jq -r .[].f0_ )
+  RESULT=$?
+  if [ $RESULT -eq 0 ]; then
+    sum_size=$(( ${sum_size} + ${size} ))
+  fi
+done
