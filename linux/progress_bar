@@ -1,0 +1,96 @@
+#!/bin/bash
+# By Tedezed
+# Simple Progress Bar
+
+usage() { 
+    echo """$0 modes:
+    - Nomal usage: $0 -s [BAR_SUCCESS_NUM] -z [BAR_SIZE_NUM]
+    - Complete bar: $0 -s [BAR_SUCCESS_NUM] -z [BAR_SIZE_NUM] -c true
+    - Dummy bar: $0 -s [BAR_SUCCESS_NUM] -z [BAR_SIZE_NUM] -d true
+
+    Calculate the percentage: (10/50)*100=20%
+        - Example: $0 -s 10 -z 50
+    """
+    exit 1;
+}
+
+while getopts ":s:z:d:c:" o; do
+    case "${o}" in
+    	s)
+            BAR_SUCCESS=${OPTARG} 
+            ;;
+        z)
+            BAR_SIZE=${OPTARG}
+            ;;
+        d)
+            DUMMY_BAR=${OPTARG}
+            ;;
+        c)
+            COMPLETE_BAR=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${BAR_SUCCESS}" ] || [ -z "${BAR_SIZE}" ]; then
+    usage
+fi
+
+function content_bar {
+    # Success bar
+    bar_character=$1
+    bar_success=$2
+    bar_size=$3
+
+    bar=""
+    for i in $(seq 1 $bar_success); do
+    bar="${bar}${bar_character}"
+    done
+    bar_len=${#bar}
+    bar_empty=$(( $bar_size - $bar_len ))
+    
+    # Add spaces
+    for i in $(seq 1 $bar_empty); do
+    bar="${bar} "
+    done
+    echo "$bar"
+}
+
+function int_bar {
+    bar=$(content_bar '#' $ext_bar_success ${int_bar_size})
+    percent=$(bc <<< "scale=2; (${ext_bar_success}/${int_bar_size})*100")
+    echo -ne "[$bar] (${percent}%)\r"
+}
+
+function complete_bar {
+    bar=$(content_bar '#' $int_bar_size ${int_bar_size})
+    ext_bar_success=$int_bar_size
+    percent=$(bc <<< "scale=2; (${ext_bar_success}/${int_bar_size})*100")
+    echo -ne "[$bar] (${percent}%)\r"
+    echo -ne '\n'
+}
+
+function dummy_bar {
+    for i in $(seq 1 ${int_bar_size}); do
+        bar=$(content_bar '#' $i ${int_bar_size})
+        percent=$(bc <<< "scale=2; (${i}/${int_bar_size})*100")
+        echo -ne "[$bar] (${percent}%)\r"
+        sleep 0.5
+    done
+    echo -ne '\n'
+}
+
+ext_bar_success=${BAR_SUCCESS}
+int_bar_size=${BAR_SIZE}
+
+if [ "${COMPLETE_BAR}" == "true" ]; then
+    complete_bar
+elif [ "${DUMMY_BAR}" == "true" ]; then
+    dummy_bar
+else
+    int_bar
+    echo ""
+fi
