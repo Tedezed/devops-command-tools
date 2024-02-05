@@ -62,7 +62,15 @@ function content_bar {
 function int_bar {
     bar=$(content_bar '#' $ext_bar_success ${int_bar_size})
     percent=$(bc <<< "scale=2; (${ext_bar_success}/${int_bar_size})*100")
-    echo -ne "[$bar] (${percent}%)\r"
+    
+    if [ $int_bar_size == $ext_bar_success ]; then
+        # Complete
+        echo -ne "[$bar] (${percent}%)\r"
+        echo -ne '\n'
+    else
+        # Add step
+        echo -ne "[$bar] (${percent}%)\r"
+    fi
 }
 
 function complete_bar {
@@ -92,5 +100,4 @@ elif [ "${DUMMY_BAR}" == "true" ]; then
     dummy_bar
 else
     int_bar
-    echo ""
 fi
