@@ -1,0 +1,19 @@
+#!/bin/bash
+# klog - Get log from all containers in a pod
+# By Tedezed
+
+POD_NAME=$1
+POD_NAMESPACE=$2
+
+if [ -z "$POD_NAME" ] || [ -z "$POD_NAMESPACE" ]; then
+    echo "[ERROR] invalid input, example:"
+    echo "   klog [POD_NAME] [POD_NAMESPACE]"
+    exit 1
+fi
+
+for container in $(kubectl get pods ${POD_NAME} -n ${POD_NAMESPACE} -o jsonpath={.spec.containers[*].name})
+do
+    echo "[INFO] Container name: $container"
+    kubectl logs ${POD_NAME} -c $container -n ${POD_NAMESPACE}
+done
+
