@@ -1,0 +1,19 @@
+#!/bin/bash
+# klog - Get log from all containers in a pod
+# By Tedezed
+
+GCLOUD_PROJECT=$1
+IAM_EMAIL=$2
+
+if [ -z "$GCLOUD_PROJECT" ] || [ -z "$IAM_EMAIL" ]; then
+    echo "[ERROR] invalid input, example:"
+    echo "   gcloud_get_iam [GCLOUD_PROJECT] [IAM_EMAIL]"
+    exit 1
+fi
+
+echo "IAM Member: ${IAM_EMAIL}"
+
+gcloud projects get-iam-policy ${GCLOUD_PROJECT}  \
+--flatten="bindings[].members" \
+--format='table(bindings.role)' \
+--filter="bindings.members:${IAM_EMAIL}"
