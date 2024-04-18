@@ -1,0 +1,17 @@
+#!/bin/bash
+# By Tedezed
+# Cloud build stop jobs with status QUEUED
+
+while true
+do
+	if [ "$(gcloud builds list --format="value(id)" --filter=status=QUEUED --limit=10 | wc -l)" == "0" ]
+	then
+		for j in $(gcloud builds list --format="value(id)" --filter=status=QUEUED --limit=100)
+		do
+			gcloud builds cancel $j &
+		done
+		sleep 5
+	else
+		break
+	fi
+done
