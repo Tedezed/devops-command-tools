@@ -12,7 +12,7 @@ do
 		do
 			gcloud builds cancel $j &
 		done
-		sleep 5
+		sleep 15
 	else
 		break
 	fi
