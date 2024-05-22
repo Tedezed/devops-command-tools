@@ -1,0 +1,12 @@
+function jwt-decode() {
+  sed 's/\./\n/g' <<< $(cut -d. -f1,2 <<< $1) | base64 --decode | jq
+}
+
+if [ -z "${1}" ]; then
+  echo '[ERROR] Need a jwt file, exmaple: jwt_decode.sh token-file.txt'
+  exit 1
+fi
+
+JWT=$(cat $1)
+
+jwt-decode $JWT

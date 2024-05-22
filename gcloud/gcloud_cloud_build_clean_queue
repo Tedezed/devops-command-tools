@@ -2,18 +2,48 @@
 # By Tedezed
 # Cloud build stop jobs with status QUEUED
 
-set -x
+MODE=$1
+OPTION=$2
 
-while true
-do
-	if [ "$(gcloud builds list --format="value(id)" --filter=status=QUEUED --limit=10 | wc -l)" != "0" ]
+if [ "$MODE" == "clean-trigger" ]
+then
+	if [ $OPTION ]
 	then
-		for j in $(gcloud builds list --format="value(id)" --filter=status=QUEUED --limit=100)
-		do
-			gcloud builds cancel $j &
-		done
-		sleep 15
-	else
-		break
+		TRIGGER_ID=$(gcloud beta builds triggers list --format="table(id,name)" | grep "${OPTION}" | awk '{ print $1 }')
+		FILTER="status=QUEUED AND buildTriggerId=$TRIGGER_ID"
 	fi
-done
+elif [ "$MODE" == "clean-all" ]
+then
+	FILTER="status=QUEUED"
+elif [ "$MODE" == "info" ]
+then
+	FILTER="status=QUEUED"
+	echo "QUEUED number: $(gcloud builds list --format='value(id)' --filter="${FILTER}" --limit=1000 | wc -l)"
+else
+	echo "[ERROR] Mode not found"
+	echo "Options:
+	- clean-trigger (TRIGGER_NAME)
+	- clean-all
+	- info"
+	exit 1
+fi
+
+if [ "$MODE" == "clean-trigger" ] || [ "$MODE" == "clean-all" ]
+then
+	set -x
+	while true
+	do
+		if [ "$(gcloud builds list --format='value(id)' --filter=\"${FILTER}\" --limit=10 | wc -l)" != "0" ]
+		then
+			for j in $(gcloud builds list --format='value(id)' --filter=\"${FILTER}\" --limit=100)
+			do
+				#echo "Stop job: $j"
+				#gcloud builds cancel $j > /dev/null 2>&1 &
+				gcloud builds cancel $j > /dev/null 2>&1 &
+			done
+			sleep 15
+		else
+			break
+		fi
+	done
+fi
